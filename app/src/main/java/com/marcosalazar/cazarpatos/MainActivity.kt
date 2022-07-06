@@ -8,6 +8,8 @@ import android.os.Handler
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                 moverPato()
             }, 500)
         }
+
     }
     private fun inicializarPantalla() {
         // 1. Obtenemos el tamaño de la pantalla del dispositivo
