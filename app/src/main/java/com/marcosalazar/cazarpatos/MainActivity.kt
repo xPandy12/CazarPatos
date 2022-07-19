@@ -1,18 +1,22 @@
 package com.marcosalazar.cazarpatos
 
+import android.content.Intent
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+
+
     lateinit var textViewUsuario: TextView
     lateinit var textViewContador: TextView
     lateinit var textViewTiempo: TextView
@@ -22,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     var alturaPantalla = 0
     var gameOver = false
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //Inicialización de variables
@@ -33,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         //Obtener el usuario de pantalla login
         val extras = intent.extras ?: return
         val usuario = extras.getString(EXTRA_LOGIN) ?:"Unknown"
-        textViewUsuario.setText(usuario)
+
+        textViewUsuario.setText(dividirUsuario(usuario))
 
         //Determina el ancho y largo de pantalla
         inicializarPantalla()
@@ -52,8 +58,15 @@ class MainActivity : AppCompatActivity() {
                 moverPato()
             }, 500)
         }
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
     private fun inicializarPantalla() {
         // 1. Obtenemos el tamaño de la pantalla del dispositivo
         val display = this.resources.displayMetrics
@@ -73,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         imageViewPato.setX(randomX.toFloat())
         imageViewPato.setY(randomY.toFloat())
     }
-    var contadorTiempo = object : CountDownTimer(60000, 1000) {
+    var contadorTiempo = object : CountDownTimer(10000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             val segundosRestantes = millisUntilFinished / 1000
             textViewTiempo.setText("${segundosRestantes}s")
@@ -90,6 +103,7 @@ class MainActivity : AppCompatActivity() {
     private fun mostrarDialogoGameOver() {
         val builder = AlertDialog.Builder(this)
         builder
+            .setIcon(R.drawable.warning)
             .setMessage("Felicidades!!\nHas conseguido cazar $contador patos")
             .setTitle("Fin del juego")
             .setPositiveButton("Reiniciar",
@@ -110,4 +124,39 @@ class MainActivity : AppCompatActivity() {
         moverPato()
         inicializarCuentaRegresiva()
     }
+
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_principal,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.nuevo_juego -> {
+                reiniciarJuego()
+                true
+            }
+            R.id.jugar_online -> {
+                var intentWeb = Intent()
+                intentWeb.action = Intent.ACTION_VIEW
+                intentWeb.data = Uri.parse("https://duckhuntjs.com")
+                startActivity(intentWeb)
+                true
+            }
+            R.id.salir -> {
+                val intencion = Intent(this, LoginActivity::class.java)
+                startActivity(intencion)
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+    private fun dividirUsuario(usuario:String):String{
+        val list = usuario.split("@")
+        return list[0]
+    }
+
 }

@@ -28,12 +28,13 @@
         android:id="@+id/textViewContador"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="12dp"
         android:fontFamily="@font/pixel"
         android:text="0"
         app:layout_constraintBottom_toBottomOf="@+id/imageViewContador"
         app:layout_constraintStart_toEndOf="@+id/imageViewContador"
-        app:layout_constraintTop_toTopOf="@+id/imageViewContador" />
+        app:layout_constraintTop_toTopOf="@+id/imageViewContador"
+        app:layout_constraintVertical_bias="0.6" />
 
     <TextView
         android:id="@+id/textViewUsuario"

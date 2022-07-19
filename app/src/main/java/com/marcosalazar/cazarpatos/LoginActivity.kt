@@ -5,11 +5,13 @@ import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.util.Patterns
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import java.io.File
 import java.io.FileInputStream
+import java.util.regex.Pattern
 
 class LoginActivity : AppCompatActivity() {
     lateinit var manejadorArchivo: FileHandler
@@ -40,6 +42,10 @@ class LoginActivity : AppCompatActivity() {
             //Validaciones de datos requeridos y formatos
             if(!ValidarDatosRequeridos())
                 return@setOnClickListener
+            if(!ValidarEmail())
+                return@setOnClickListener
+            if(!ValidarContraseña())
+                return@setOnClickListener
             //Guardar datos en preferencias
             GuardarDatosEnPreferencias()
             //Si pasa validación de datos requeridos, ir a pantalla principal
@@ -67,8 +73,13 @@ class LoginActivity : AppCompatActivity() {
             editTextPassword.requestFocus()
             return false
         }
-        if (clave.length < 3) {
-            editTextPassword.setError("La clave debe tener al menos 3 caracteres")
+        if(!ValidarEmail()){
+            editTextEmail.setError("El email no es válido")
+            editTextEmail.requestFocus()
+            return false
+        }
+        if(!ValidarContraseña()){
+            editTextPassword.setError("La clave es menor a 8 caracteres")
             editTextPassword.requestFocus()
             return false
         }
@@ -101,6 +112,17 @@ class LoginActivity : AppCompatActivity() {
         manejadorArchivo.SaveInformation(listadoAGrabar)
     }
 
+    private fun ValidarEmail():Boolean{
+        val email = editTextEmail.text.toString()
+        val pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(email).matches()
+    }
 
-
+    private fun ValidarContraseña():Boolean{
+        val clave = editTextPassword.text.toString()
+        if (clave.length < 8) {
+            return false
+        }
+        return true
+    }
 }
