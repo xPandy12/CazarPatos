@@ -33,19 +33,24 @@ class FileExternalManager(val actividad: Activity) : FileHandler{
     override fun ReadInformation():Pair<String,String>{
         var email = ""
         var clave = ""
-        if (isExternalStorageReadable()) {
-            FileInputStream(
-                File(
-                    actividad.getExternalFilesDir(null),
-                    "mySharedInformation.dat"
-                )
-            ).bufferedReader().use {
-                val datoLeido = it.readText()
-                val textArray = datoLeido.split(System.lineSeparator())
-                email = textArray[0].toString()
-                clave = textArray[1].toString()
+        try {
+            if (isExternalStorageReadable()) {
+                FileInputStream(
+                    File(
+                        actividad.getExternalFilesDir(null),
+                        "mySharedInformation.dat"
+                    )
+                ).bufferedReader().use {
+                    val datoLeido = it.readText()
+                    val textArray = datoLeido.split(System.lineSeparator())
+                    email = textArray[0].toString()
+                    clave = textArray[1].toString()
 
+                }
             }
+
+        }catch (e: FileSystemException){
+
         }
         return (email to clave)
     }
