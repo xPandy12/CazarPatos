@@ -14,6 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -28,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var imageViewPato: ImageView
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var database: DatabaseReference
+    private lateinit var  mAdView: AdView
     var contador = 0
     var anchoPantalla = 0
     var alturaPantalla = 0
@@ -44,6 +49,13 @@ class MainActivity : AppCompatActivity() {
 
         mediaPlayer = MediaPlayer.create(this, R.raw.gunshot)
         //database = Firebase.database.reference
+
+        MobileAds.initialize(this) {}
+
+        mAdView = findViewById<AdView>(R.id.adView)
+        //mAdView.adUnitId = "ca-app-pub-6551542058079007/8542304344" //TODO: Colocar esto antes de publicar
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         //Obtener el usuario de pantalla login
         val extras = intent.extras ?: return
@@ -189,7 +201,7 @@ class MainActivity : AppCompatActivity() {
         return list[0]
     }
 
-    /*fun procesarPuntajePatosCazados(nombreJugador:String, patosCazados:Int){
+    fun procesarPuntajePatosCazados(nombreJugador:String, patosCazados:Int){
         val jugador = Jugador(nombreJugador,patosCazados)
         //Trata de obtener id del documento del ranking específico,
         // si lo obtiene lo actualiza, caso contrario lo crea
@@ -213,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                 Log.w(EXTRA_LOGIN, "Error getting documents", exception)
                 Toast.makeText(this, "Error al obtener datos de jugador", Toast.LENGTH_LONG).show()
             }
-    }*/
+    }
 
     fun procesarPuntajePatosCazadosRTDB(nombreJugador:String, patosCazados:Int){
         val jugador = Jugador(nombreJugador,patosCazados)
