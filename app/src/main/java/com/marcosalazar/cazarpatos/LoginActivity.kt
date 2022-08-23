@@ -33,8 +33,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var storage: FirebaseStorage
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         //Inicialización de variables
@@ -45,22 +43,20 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
 
+        LeerDatosDePreferencias()
+
         // Initialize Firebase Auth
         auth = Firebase.auth
         // Initialize Firebase Storage
         storage = Firebase.storage
 
-        LeerDatosDePreferencias()
+
         //Eventos clic
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val clave = editTextPassword.text.toString()
             //Validaciones de datos requeridos y formatos
             if(!ValidarDatosRequeridos())
-                return@setOnClickListener
-            if(!ValidarEmail())
-                return@setOnClickListener
-            if(!ValidarContraseña())
                 return@setOnClickListener
             //Guardar datos en preferencias
             GuardarDatosEnPreferencias()

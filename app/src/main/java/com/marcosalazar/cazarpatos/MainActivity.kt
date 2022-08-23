@@ -24,8 +24,6 @@ import com.google.firebase.ktx.Firebase
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-
-
     lateinit var textViewUsuario: TextView
     lateinit var textViewContador: TextView
     lateinit var textViewTiempo: TextView
@@ -46,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         textViewContador = findViewById(R.id.textViewContador)
         textViewTiempo = findViewById(R.id.textViewTiempo)
         imageViewPato = findViewById(R.id.imageViewPato)
-
         mediaPlayer = MediaPlayer.create(this, R.raw.gunshot)
         //database = Firebase.database.reference
 
@@ -59,8 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         //Obtener el usuario de pantalla login
         val extras = intent.extras ?: return
-        val usuario = extras.getString(EXTRA_LOGIN) ?:"Unknown"
-
+        var usuario = extras.getString(EXTRA_LOGIN) ?:"Unknown"
+        usuario = usuario.substringBefore("@")
         textViewUsuario.setText(dividirUsuario(usuario))
 
         //Determina el ancho y largo de pantalla
@@ -84,10 +81,7 @@ class MainActivity : AppCompatActivity() {
                 mediaPlayer?.seekTo(0)
             }, 600)
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
-
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
@@ -124,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             mostrarDialogoGameOver()
             val nombreJugador = textViewUsuario.text.toString()
             val patosCazados = textViewContador.text.toString()
-            procesarPuntajePatosCazadosRTDB(nombreJugador, patosCazados.toInt()) //Firestore
+            procesarPuntajePatosCazados(nombreJugador, patosCazados.toInt()) //Firestore
             //procesarPuntajePatosCazadosRTDB(nombreJugador, patosCazados.toInt()) //Realtime Database
         }
     }
@@ -135,8 +129,8 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder
             .setMessage("Felicidades!!\nHas conseguido cazar $contador patos")
-            .setTitle("Fin del juego")
             .setIcon(R.drawable.duck)
+            .setTitle("Fin del juego")
             .setPositiveButton("Reiniciar",
                 { _, _ ->
                     reiniciarJuego()
@@ -147,6 +141,7 @@ class MainActivity : AppCompatActivity() {
                 })
         builder.create().show()
     }
+
     fun reiniciarJuego(){
         contador = 0
         gameOver = false
@@ -154,6 +149,11 @@ class MainActivity : AppCompatActivity() {
         textViewContador.setText(contador.toString())
         moverPato()
         inicializarCuentaRegresiva()
+    }
+
+    override fun onDestroy() {
+        //mediaPlayer?.release()
+        super.onDestroy()
     }
 
     override fun onStop() {
@@ -164,38 +164,15 @@ class MainActivity : AppCompatActivity() {
         //mediaPlayer?.stop()
         super.onStop()
     }
-    override fun onDestroy() {
-        //mediaPlayer?.release()
-        super.onDestroy()
+
+    fun jugarOnline(){
+        var intentWeb = Intent()
+        intentWeb.action = Intent.ACTION_VIEW
+        intentWeb.data = Uri.parse("https://duckhuntjs.com/")
+        startActivity(intentWeb)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_principal,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.nuevo_juego -> {
-                reiniciarJuego()
-                true
-            }
-            R.id.jugar_online -> {
-                var intentWeb = Intent()
-                intentWeb.action = Intent.ACTION_VIEW
-                intentWeb.data = Uri.parse("https://duckhuntjs.com")
-                startActivity(intentWeb)
-                true
-            }
-            R.id.salir -> {
-                val intencion = Intent(this, LoginActivity::class.java)
-                startActivity(intencion)
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
     private fun dividirUsuario(usuario:String):String{
         val list = usuario.split("@")
         return list[0]
@@ -258,6 +235,39 @@ class MainActivity : AppCompatActivity() {
                 Log.w(EXTRA_LOGIN, "Error updating document", exception)
                 Toast.makeText(this,"Error al actualizar el puntaje" , Toast.LENGTH_LONG).show()
             }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_principal,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_nuevo_juego -> {
+                reiniciarJuego()
+                true
+            }
+            R.id.action_jugar_online -> {
+                var intentWeb = Intent()
+                intentWeb.action = Intent.ACTION_VIEW
+                intentWeb.data = Uri.parse("https://duckhuntjs.com")
+                startActivity(intentWeb)
+                true
+            }
+            R.id.action_ranking -> {
+                val intencion = Intent(this, RankingActivity::class.java)
+                startActivity(intencion)
+                true
+            }
+
+            R.id.salir -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 
